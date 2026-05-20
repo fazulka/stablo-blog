@@ -1,16 +1,16 @@
 import "@/styles/tailwind.css";
-import { Providers } from "./providers";
-import { cx } from "@/utils/all";
-import { Inter, Lora } from "next/font/google";
+import { Plus_Jakarta_Sans, Caveat } from "next/font/google";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter"
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+  variable: "--font-jakarta"
 });
 
-const lora = Lora({
-  subsets: ["latin"],
-  variable: "--font-lora"
+const caveat = Caveat({
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+  variable: "--font-caveat"
 });
 
 export default function RootLayout({
@@ -20,11 +20,10 @@ export default function RootLayout({
 }) {
   return (
     <html
-      lang="en"
-      suppressHydrationWarning
-      className={cx(inter.variable, lora.variable)}>
-      <body className="antialiased text-gray-800 dark:bg-black dark:text-gray-400">
-        <Providers>{children}</Providers>
+      lang="sk"
+      className={`${jakarta.variable} ${caveat.variable}`}>
+      <body className="bg-paper text-ink antialiased">
+        {children}
       </body>
     </html>
   );

@@ -1,5 +1,6 @@
 
 {
+    "root": true,
     "extends": ["next"],
     "rules": {
     "react/jsx-no-target-blank": [2, { "allowReferrer": true }],
