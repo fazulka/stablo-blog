@@ -63,8 +63,15 @@ export default function BookingForm({
       });
       const data = await res.json();
       if (!res.ok || !data.ok) {
-        setServerError(data.error || "Niečo sa pokazilo. Skús to ešte raz.");
+        setServerError(
+          data.error || "Niečo sa pokazilo. Skús to ešte raz."
+        );
         setSubmitting(false);
+        return;
+      }
+      if (data.checkoutUrl) {
+        // Card payment — continue to Stripe Checkout.
+        window.location.assign(data.checkoutUrl);
         return;
       }
       router.push(`/rezervacia/dakujeme/${data.bookingId}`);
@@ -203,36 +210,44 @@ export default function BookingForm({
           />
           <div className="flex-1">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-ink">Bankový prevod</span>
+              <span className="font-semibold text-ink">
+                Bankový prevod
+              </span>
               <span className="rounded-full bg-paper-50 px-2 py-0.5 text-xs text-ink-muted ring-1 ring-paper-200">
                 Odporúčané
               </span>
             </div>
             <p className="mt-1 text-sm text-ink-soft">
-              Po odoslaní ti pošlem IBAN a variabilný symbol. Miesto rezervujem
-              hneď, ako dorazí platba.
+              Po odoslaní ti pošlem IBAN a variabilný symbol. Miesto
+              rezervujem hneď, ako dorazí platba.
             </p>
           </div>
         </label>
 
         <label
-          className="flex cursor-not-allowed items-start gap-3 rounded-2xl border-2 border-paper-200 bg-paper-100/60 p-4 opacity-60">
+          className={`flex cursor-pointer items-start gap-3 rounded-2xl border-2 p-4 transition ${
+            paymentMethod === "card"
+              ? "border-rose bg-rose-light/40"
+              : "border-paper-200 bg-paper-50 hover:border-rose-soft"
+          }`}>
           <input
             type="radio"
             value="card"
-            disabled
             className="mt-1 accent-rose"
             {...register("paymentMethod")}
           />
           <div className="flex-1">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-ink">Kartou (Stripe)</span>
+              <span className="font-semibold text-ink">
+                Kartou online
+              </span>
               <span className="rounded-full bg-azure-light px-2 py-0.5 text-xs font-medium text-azure-deep">
-                Čoskoro
+                Okamžité potvrdenie
               </span>
             </div>
             <p className="mt-1 text-sm text-ink-soft">
-              Pripravujem — pridám hneď, ako bude pripravený platobný účet.
+              Bezpečná platba kartou cez Stripe. Miesto máš potvrdené
+              hneď po zaplatení.
             </p>
           </div>
         </label>
@@ -247,7 +262,8 @@ export default function BookingForm({
           })}
         />
         <span>
-          Súhlasím so spracovaním osobných údajov za účelom rezervácie. *
+          Súhlasím so spracovaním osobných údajov za účelom
+          rezervácie. *
           {errors.consentGdpr && (
             <span className="block text-rose-dark">
               {errors.consentGdpr.message}
@@ -273,7 +289,11 @@ export default function BookingForm({
             type="submit"
             disabled={submitting}
             className="btn-rose text-base disabled:cursor-not-allowed disabled:opacity-60">
-            {submitting ? "Odosielam..." : "Dokončiť rezerváciu"}
+            {submitting
+              ? "Odosielam..."
+              : paymentMethod === "card"
+                ? "Pokračovať na platbu"
+                : "Dokončiť rezerváciu"}
           </button>
         </div>
       </div>
@@ -287,8 +307,9 @@ export default function BookingForm({
       )}
 
       <p className="text-xs text-ink-muted">
-        Odoslaním rezervácie potvrdzuješ, že si si prečítala podmienky zrušenia
-        a refundácie. Workshop: <strong>{workshopTitle}</strong>.
+        Odoslaním rezervácie potvrdzuješ, že si si prečítala podmienky
+        zrušenia a refundácie. Workshop:{" "}
+        <strong>{workshopTitle}</strong>.
       </p>
     </form>
   );

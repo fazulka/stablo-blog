@@ -6,6 +6,7 @@ import {
   seatsAvailable,
   sendBookingEmail
 } from "@/lib/booking";
+import { getStripe } from "@/lib/stripe";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -54,13 +55,16 @@ export async function POST(request) {
   if (paymentMethod !== "bank_transfer" && paymentMethod !== "card") {
     return bad("Vyber spôsob platby.");
   }
-  if (paymentMethod === "card") {
+  const stripe = paymentMethod === "card" ? getStripe() : null;
+  if (paymentMethod === "card" && !stripe) {
     return bad(
-      "Platba kartou bude čoskoro dostupná. Zatiaľ prosím použi bankový prevod."
+      "Platba kartou momentálne nie je dostupná. Prosím, použi bankový prevod."
     );
   }
   if (consentGdpr !== true) {
-    return bad("Pre dokončenie rezervácie potvrď súhlas so spracovaním údajov.");
+    return bad(
+      "Pre dokončenie rezervácie potvrď súhlas so spracovaním údajov."
+    );
   }
 
   // ─── Session + capacity check ────────────────────────────────────────
@@ -110,9 +114,71 @@ export async function POST(request) {
     );
   }
 
-  // ─── Send instructions email (stub for now) ──────────────────────────
+  const settings = await getSettings();
+
+  // ─── Card: hand off to Stripe Checkout ───────────────────────────────
+  if (paymentMethod === "card") {
+    const origin =
+      (settings?.url || "").replace(/\/$/, "") ||
+      new URL(request.url).origin;
+    let checkout;
+    try {
+      checkout = await stripe.checkout.sessions.create({
+        mode: "payment",
+        locale: "sk",
+        customer_email: booking.customerEmail,
+        line_items: [
+          {
+            quantity: seats,
+            price_data: {
+              currency: "eur",
+              unit_amount: Math.round(session.price * 100),
+              product_data: {
+                name: session.workshop?.title || "Workshop"
+              }
+            }
+          }
+        ],
+        metadata: { bookingId: booking._id },
+        payment_intent_data: { metadata: { bookingId: booking._id } },
+        success_url: `${origin}/rezervacia/dakujeme/${booking._id}?platba=ok`,
+        cancel_url: `${origin}/rezervacia/${sessionId}?platba=zrusena`
+      });
+    } catch (err) {
+      console.error("Stripe checkout creation failed:", err);
+      // Don't leave an orphan awaiting_payment booking the customer can't pay.
+      await writeClient
+        .patch(booking._id)
+        .set({
+          status: "cancelled",
+          internalNotes:
+            "Automaticky zrušené — vytvorenie Stripe platby zlyhalo."
+        })
+        .commit()
+        .catch(() => {});
+      return bad(
+        "Platbu kartou sa nepodarilo pripraviť. Skús to ešte raz, alebo použi bankový prevod.",
+        502
+      );
+    }
+
+    await writeClient
+      .patch(booking._id)
+      .set({ stripeSessionId: checkout.id })
+      .commit()
+      .catch(err =>
+        console.warn("Failed to store Stripe session id:", err)
+      );
+
+    return NextResponse.json({
+      ok: true,
+      bookingId: booking._id,
+      checkoutUrl: checkout.url
+    });
+  }
+
+  // ─── Bank transfer: send payment instructions email ──────────────────
   try {
-    const settings = await getSettings();
     await sendBookingEmail({
       type: "bank_transfer_instructions",
       booking,
