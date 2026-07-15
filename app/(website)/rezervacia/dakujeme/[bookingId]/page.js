@@ -35,7 +35,9 @@ export default async function BookingConfirmationPage({ params }) {
   const session = booking.session;
   const workshop = session?.workshop;
   const dates = session?.dates || [];
-  const heroImg = workshop?.mainImage ? urlForImage(workshop.mainImage) : null;
+  const heroImg = workshop?.mainImage
+    ? urlForImage(workshop.mainImage)
+    : null;
   const isPaid = booking.status === "paid";
   const isBankTransfer = booking.paymentMethod === "bank_transfer";
 
@@ -50,12 +52,16 @@ export default async function BookingConfirmationPage({ params }) {
               {isPaid ? (
                 <>
                   Rezervácia je{" "}
-                  <span className="font-display text-rose-dark">potvrdená</span>
+                  <span className="font-display text-rose-dark">
+                    potvrdená
+                  </span>
                 </>
               ) : (
                 <>
                   Skoro{" "}
-                  <span className="font-display text-rose-dark">hotovo</span>
+                  <span className="font-display text-rose-dark">
+                    hotovo
+                  </span>
                 </>
               )}
             </h1>
@@ -74,16 +80,22 @@ export default async function BookingConfirmationPage({ params }) {
                 <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[220px]">
                   <Image
                     src={heroImg.src}
-                    alt={workshop?.mainImage?.alt || workshop?.title || ""}
+                    alt={
+                      workshop?.mainImage?.alt ||
+                      workshop?.title ||
+                      ""
+                    }
                     fill
                     sizes="(max-width: 768px) 100vw, 350px"
-                    placeholder={workshop?.mainImage?.lqip ? "blur" : "empty"}
+                    placeholder={
+                      workshop?.mainImage?.lqip ? "blur" : "empty"
+                    }
                     blurDataURL={workshop?.mainImage?.lqip}
                     className="object-cover"
                   />
                 </div>
               )}
-              <div className="md:col-span-2 p-6 md:p-8">
+              <div className="p-6 md:col-span-2 md:p-8">
                 <h2 className="text-2xl font-bold leading-tight">
                   {workshop?.title}
                 </h2>
@@ -154,7 +166,25 @@ export default async function BookingConfirmationPage({ params }) {
 
           {/* Payment instructions */}
           {!isPaid && isBankTransfer && (
-            <PaymentInstructions booking={booking} settings={settings} />
+            <PaymentInstructions
+              booking={booking}
+              settings={settings}
+            />
+          )}
+
+          {/* Card payment still being processed by Stripe webhook */}
+          {!isPaid && !isBankTransfer && (
+            <div className="mt-8 rounded-3xl bg-azure-light/50 p-6 ring-1 ring-azure-soft md:p-8">
+              <h3 className="text-xl font-bold">
+                Spracovávame platbu…
+              </h3>
+              <p className="mt-2 text-ink-soft">
+                Ak si práve zaplatila kartou, potvrdenie príde
+                e-mailom na <strong>{booking.customerEmail}</strong>{" "}
+                do pár minút. Ak si platbu nedokončila, rezervácia
+                zostane nezáväzná a miesto sa uvoľní.
+              </p>
+            </div>
           )}
 
           {isPaid && (
@@ -168,8 +198,9 @@ export default async function BookingConfirmationPage({ params }) {
                     Tvoje miesto je zarezervované ✓
                   </h3>
                   <p className="mt-2 text-ink-soft">
-                    Pošlem ti pripomienkový e-mail pár dní pred workshopom. Ak
-                    by si potrebovala čokoľvek upraviť, napíš mi.
+                    Pošlem ti pripomienkový e-mail pár dní pred
+                    workshopom. Ak by si potrebovala čokoľvek upraviť,
+                    napíš mi.
                   </p>
                 </div>
               </div>
@@ -188,7 +219,9 @@ export default async function BookingConfirmationPage({ params }) {
 
           <p className="mt-8 text-center text-xs text-ink-muted">
             Číslo rezervácie:{" "}
-            <span className="font-mono">{booking._id.slice(-12)}</span>
+            <span className="font-mono">
+              {booking._id.slice(-12)}
+            </span>
           </p>
         </div>
       </Container>
@@ -217,23 +250,37 @@ function PaymentInstructions({ booking, settings }) {
         {hasBank ? (
           <>
             <p className="mt-3 text-ink-soft">
-              Pošli platbu na tento účet — hneď ako dorazí, potvrdím ti
-              rezerváciu e-mailom.
+              Pošli platbu na tento účet — hneď ako dorazí, potvrdím
+              ti rezerváciu e-mailom.
             </p>
 
             <dl className="mt-6 grid gap-3 sm:grid-cols-2">
-              <InfoCell label="Suma" value={formatPrice(booking.totalAmount)} highlight />
+              <InfoCell
+                label="Suma"
+                value={formatPrice(booking.totalAmount)}
+                highlight
+              />
               <InfoCell
                 label="Variabilný symbol"
                 value={booking.variableSymbol}
                 mono
                 highlight
               />
-              <InfoCell label="IBAN" value={iban} mono className="sm:col-span-2" />
+              <InfoCell
+                label="IBAN"
+                value={iban}
+                mono
+                className="sm:col-span-2"
+              />
               {accountHolder && (
-                <InfoCell label="Majiteľ účtu" value={accountHolder} />
+                <InfoCell
+                  label="Majiteľ účtu"
+                  value={accountHolder}
+                />
               )}
-              {bankName && <InfoCell label="Banka" value={bankName} />}
+              {bankName && (
+                <InfoCell label="Banka" value={bankName} />
+              )}
             </dl>
 
             <div className="mt-5 rounded-2xl bg-paper-50 p-4 text-sm text-ink-soft ring-1 ring-paper-200">
@@ -241,8 +288,8 @@ function PaymentInstructions({ booking, settings }) {
               <ul className="mt-2 list-disc space-y-1 pl-5">
                 <li>
                   Použi presne variabilný symbol{" "}
-                  <strong>{booking.variableSymbol}</strong> — podľa neho
-                  identifikujem tvoju platbu.
+                  <strong>{booking.variableSymbol}</strong> — podľa
+                  neho identifikujem tvoju platbu.
                 </li>
                 <li>
                   Inštrukcie ti pošlem aj na e-mail{" "}
@@ -255,11 +302,13 @@ function PaymentInstructions({ booking, settings }) {
           <div className="mt-3 rounded-2xl bg-paper-50 p-5 ring-1 ring-paper-200">
             <p className="text-ink-soft">
               Inštrukcie k platbe ti pošlem e-mailom na{" "}
-              <strong>{booking.customerEmail}</strong> v priebehu pár hodín.
+              <strong>{booking.customerEmail}</strong> v priebehu pár
+              hodín.
             </p>
             <p className="mt-2 text-xs text-ink-muted">
-              (Bankové údaje ešte nie sú nastavené v CMS — vyplníš ich v
-              Nastaveniach stránky a inštrukcie sa zobrazia automaticky.)
+              (Bankové údaje ešte nie sú nastavené v CMS — vyplníš ich
+              v Nastaveniach stránky a inštrukcie sa zobrazia
+              automaticky.)
             </p>
             <dl className="mt-4 grid gap-3 sm:grid-cols-2">
               <InfoCell
