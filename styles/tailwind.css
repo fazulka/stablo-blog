@@ -2,8 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
-/*! purgecss start ignore */
-@import "prism.css";
-/*! purgecss end ignore */
+@layer base {
+  body {
+    font-feature-settings: "ss01", "cv11";
+  }
 
-/*Custom Styles Here*/
+  ::selection {
+    background-color: #f4b5c6;
+    color: #241f35;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-ink;
+  }
+}
+
+@layer components {
+  .btn-rose {
+    @apply inline-flex items-center justify-center rounded-full bg-rose px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-dark hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-dark focus-visible:ring-offset-2 focus-visible:ring-offset-paper;
+  }
+
+  .btn-azure {
+    @apply inline-flex items-center justify-center rounded-full bg-azure px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-azure-dark hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-azure-dark focus-visible:ring-offset-2 focus-visible:ring-offset-paper;
+  }
+
+  .btn-ink {
+    @apply inline-flex items-center justify-center rounded-full bg-ink px-6 py-3 text-sm font-semibold text-paper-50 transition hover:bg-ink-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-rose;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center rounded-full border-2 border-ink px-6 py-3 text-sm font-semibold text-ink transition hover:bg-ink hover:text-paper-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose;
+  }
+
+  .btn-outline-rose {
+    @apply inline-flex items-center justify-center rounded-full border-2 border-rose px-6 py-3 text-sm font-semibold text-rose-dark transition hover:bg-rose hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-dark;
+  }
+
+  .display {
+    @apply font-display font-medium text-ink;
+  }
+
+  .eyebrow {
+    @apply font-display text-2xl text-rose-dark md:text-3xl;
+  }
+
+  .eyebrow-azure {
+    @apply font-display text-2xl text-azure-dark md:text-3xl;
+  }
+}

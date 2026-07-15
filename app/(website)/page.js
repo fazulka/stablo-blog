@@ -1,9 +1,14 @@
-import HomePage from "./home";
-import { getAllPosts } from "@/lib/sanity/client";
+import Home from "./home";
+import { getUpcomingSessions, getAllCategories } from "@/lib/sanity/client";
 
 export default async function IndexPage() {
-  const posts = await getAllPosts();
-  return <HomePage posts={posts} />;
+  const [upcomingSessions, categories] = await Promise.all([
+    getUpcomingSessions(6),
+    getAllCategories()
+  ]);
+  return (
+    <Home upcomingSessions={upcomingSessions} categories={categories} />
+  );
 }
 
-// export const revalidate = 60;
+export const revalidate = 60;

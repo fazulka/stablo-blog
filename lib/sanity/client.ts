@@ -1,19 +1,14 @@
 import { apiVersion, dataset, projectId, useCdn } from "./config";
 import {
-  postquery,
-  limitquery,
-  paginatedquery,
-  configQuery,
-  singlequery,
-  pathquery,
-  allauthorsquery,
-  authorsquery,
-  postsbyauthorquery,
-  postsbycatquery,
-  catpathquery,
-  catquery,
-  getAll,
-  searchquery
+  settingsQuery,
+  allWorkshopsQuery,
+  featuredWorkshopsQuery,
+  workshopBySlugQuery,
+  workshopSlugsQuery,
+  upcomingSessionsQuery,
+  sessionByIdQuery,
+  allCategoriesQuery,
+  bookingByIdQuery
 } from "./groq";
 import { createClient } from "next-sanity";
 
@@ -23,111 +18,61 @@ if (!projectId) {
   );
 }
 
-/**
- * Checks if it's safe to create a client instance, as `@sanity/client` will throw an error if `projectId` is false
- */
-const client = projectId
+export const client = projectId
   ? createClient({ projectId, dataset, apiVersion, useCdn })
   : null;
 
-export const fetcher = async ([query, params]) => {
+export const fetcher = async ([query, params]: [string, Record<string, unknown>]) => {
   return client ? client.fetch(query, params) : [];
 };
 
-(async () => {
-  if (client) {
-    const data = await client.fetch(getAll);
-    if (!data || !data.length) {
-      console.error(
-        "Sanity returns empty array. Are you sure the dataset is public?"
-      );
-    }
-  }
-})();
-
-export async function getAllPosts() {
-  if (client) {
-    return (await client.fetch(postquery)) || [];
-  }
-  return [];
-}
-
+// ─── Settings ──────────────────────────────────────────────────────────────
 export async function getSettings() {
-  if (client) {
-    return (await client.fetch(configQuery)) || [];
-  }
-  return [];
+  if (!client) return {};
+  return (await client.fetch(settingsQuery)) || {};
 }
 
-export async function getPostBySlug(slug) {
-  if (client) {
-    return (await client.fetch(singlequery, { slug })) || {};
-  }
-  return {};
+// ─── Workshops ─────────────────────────────────────────────────────────────
+export async function getAllWorkshops() {
+  if (!client) return [];
+  return (await client.fetch(allWorkshopsQuery)) || [];
 }
 
-export async function getAllPostsSlugs() {
-  if (client) {
-    const slugs = (await client.fetch(pathquery)) || [];
-    return slugs.map(slug => ({ slug }));
-  }
-  return [];
-}
-// Author
-export async function getAllAuthorsSlugs() {
-  if (client) {
-    const slugs = (await client.fetch(authorsquery)) || [];
-    return slugs.map(slug => ({ author: slug }));
-  }
-  return [];
+export async function getFeaturedWorkshops() {
+  if (!client) return [];
+  return (await client.fetch(featuredWorkshopsQuery)) || [];
 }
 
-export async function getAuthorPostsBySlug(slug) {
-  if (client) {
-    return (await client.fetch(postsbyauthorquery, { slug })) || {};
-  }
-  return {};
+export async function getWorkshopBySlug(slug: string) {
+  if (!client) return null;
+  return (await client.fetch(workshopBySlugQuery, { slug })) || null;
 }
 
-export async function getAllAuthors() {
-  if (client) {
-    return (await client.fetch(allauthorsquery)) || [];
-  }
-  return [];
+export async function getAllWorkshopSlugs() {
+  if (!client) return [];
+  const slugs: string[] = (await client.fetch(workshopSlugsQuery)) || [];
+  return slugs.map(slug => ({ slug }));
 }
 
-// Category
+// ─── Sessions ──────────────────────────────────────────────────────────────
+export async function getUpcomingSessions(limit = 50) {
+  if (!client) return [];
+  return (await client.fetch(upcomingSessionsQuery, { limit })) || [];
+}
 
+export async function getSessionById(id: string) {
+  if (!client) return null;
+  return (await client.fetch(sessionByIdQuery, { id })) || null;
+}
+
+// ─── Categories ────────────────────────────────────────────────────────────
 export async function getAllCategories() {
-  if (client) {
-    const slugs = (await client.fetch(catpathquery)) || [];
-    return slugs.map(slug => ({ category: slug }));
-  }
-  return [];
+  if (!client) return [];
+  return (await client.fetch(allCategoriesQuery)) || [];
 }
 
-export async function getPostsByCategory(slug) {
-  if (client) {
-    return (await client.fetch(postsbycatquery, { slug })) || {};
-  }
-  return {};
-}
-
-export async function getTopCategories() {
-  if (client) {
-    return (await client.fetch(catquery)) || [];
-  }
-  return [];
-}
-
-export async function getPaginatedPosts({ limit, pageIndex = 0 }) {
-  if (client) {
-    return (
-      (await client.fetch(paginatedquery, {
-        pageIndex: pageIndex,
-        limit: limit
-      })) || []
-    );
-  }
-  return [];
+// ─── Bookings ────────────────────────────────────────────────────────────
+export async function getBookingById(id: string) {
+  if (!client) return null;
+  return (await client.fetch(bookingByIdQuery, { id })) || null;
 }
