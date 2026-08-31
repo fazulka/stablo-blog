@@ -23,7 +23,6 @@ async function sharedMetaData() {
       "háčkovanie",
       "makramé",
       "Jesmonite",
-      "maľovanie na sklo",
       "kurzy",
       "workshop"
     ],

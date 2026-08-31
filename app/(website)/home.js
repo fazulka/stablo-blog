@@ -227,11 +227,33 @@ function AboutTeaser() {
 }
 
 function PartiesTeaser() {
+  const items = [
+    {
+      icon: "/img/birthday.svg",
+      title: "Oslavy narodenín",
+      color: "rose"
+    },
+    {
+      icon: "/img/bride.svg",
+      title: "Rozlúčky so slobodou",
+      color: "azure"
+    },
+    {
+      icon: "/img/group.svg",
+      title: "Firemné teambuildingy",
+      color: "rose"
+    },
+    {
+      icon: "/img/pregnant.svg",
+      title: "Baby shower",
+      color: "azure"
+    }
+  ];
   return (
     <section className="relative overflow-hidden bg-paper">
       <DoodleField variant="default" />
       <Container large className="relative !py-20">
-        <div className="relative overflow-hidden rounded-[2.5rem] bg-ink p-10 text-paper-50 shadow-xl md:p-16">
+        <div className="relative overflow-hidden rounded-[2.5rem] bg-paper p-10 text-paper-50 shadow-xl md:p-16">
           <Blob className="absolute -bottom-24 -right-24 h-80 w-80 text-rose/15" />
           <Blob className="absolute -top-24 -left-24 h-80 w-80 -scale-x-100 text-azure/20" />
           <div className="relative grid items-center gap-10 md:grid-cols-2">
@@ -244,7 +266,7 @@ function PartiesTeaser() {
                 slobodou alebo teambuilding.
               </h2>
               <Squiggle className="mt-4 w-24 text-azure-soft" />
-              <p className="mt-5 text-paper-100/80">
+              <p className="mt-5 text-amber-300 100/80">
                 Pripravím vám tvorivý zážitok na mieru. Vyberieme spolu
                 techniku, ladenie aj výsledný výtvor. Stačí mi povedať,
                 koľko vás bude.
@@ -258,23 +280,15 @@ function PartiesTeaser() {
               </div>
             </div>
             <ul className="grid gap-4">
-              {[
-                { emoji: "🎂", title: "Oslavy narodenín", color: "rose" },
-                { emoji: "👰", title: "Rozlúčky so slobodou", color: "azure" },
-                { emoji: "🤝", title: "Firemné teambuildingy", color: "rose" },
-                { emoji: "👶", title: "Baby shower stretnutia", color: "azure" }
-              ].map(item => (
+              {items.map(item => (
                 <li
                   key={item.title}
                   className={`flex items-center gap-4 rounded-2xl px-5 py-3 ${
-                    item.color === "rose"
-                      ? "bg-rose/15"
-                      : "bg-azure/20"
-                  }`}>
-                  <span className="text-2xl">{item.emoji}</span>
-                  <span className="font-medium text-paper-50">
-                    {item.title}
-                  </span>
+                    item.color === "rose" ? "bg-rose/15" : "bg-azure/20"
+                  }`}
+                >
+                  <img src={item.icon} alt="" className="h-8 w-8" />
+                  <span className="font-medium text-paper-50">{item.title}</span>
                 </li>
               ))}
             </ul>
