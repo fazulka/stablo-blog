@@ -387,7 +387,7 @@ export default async function WorkshopDetailPage({ params }) {
               <span className="font-display text-2xl text-rose-soft">
                 Chceš tento workshop pre vašu skupinu?
               </span>
-              <h3 className="mt-1 text-lg font-semibold md:text-xl">
+              <h3 className="mt-1 text-lg font-semibold text-paper-50 md:text-xl">
                 Pripravím vám ho na mieru — narodeniny, rozlúčka so slobodou
                 alebo teambuilding.
               </h3>

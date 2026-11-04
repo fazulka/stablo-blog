@@ -143,7 +143,7 @@ export default function PrivateEventsPage() {
                     </span>
                     <Icon className={`h-4 w-4 ${item.color}`} />
                   </div>
-                  <h4 className="mt-2 text-lg font-semibold">
+                  <h4 className="mt-2 text-lg font-semibold text-paper-50">
                     {item.title}
                   </h4>
                   <p className="mt-1 text-sm text-paper-100/80">
