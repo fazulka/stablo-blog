@@ -239,7 +239,7 @@ function PartiesTeaser() {
               <span className="font-display text-3xl text-rose-soft">
                 Súkromné akcie
               </span>
-              <h2 className="mt-2 text-3xl font-bold md:text-4xl">
+              <h2 className="mt-2 text-3xl font-bold text-paper-50 md:text-4xl">
                 Workshop pre vašu skupinu — narodeniny, rozlúčka so
                 slobodou alebo teambuilding.
               </h2>
